@@ -9,6 +9,9 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,6 +28,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
+    BookAdapter bk_adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +42,17 @@ public class MainActivity extends AppCompatActivity {
                 bg_task.execute();
             }
         } ); // closing parenthesis of "setOnClickListener()" method
+
+        findViewById(R.id.llayout_reset).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //ListView lv=(ListView)findViewById(R.id.lv_bookslist);
+                bk_adapter.clear();
+                bk_adapter.notifyDataSetChanged();
+                //lv.setAdapter(null);
+
+            }
+        });
 
     }
 
@@ -58,27 +73,33 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // makes Http Request, fetches the JSON file/stream, parses it
-        @Override
-        protected ArrayList<Book> doInBackground(URL... searchURL) { /* Probably I'm doing something wrong here. The searchURL isn't being used anywhere */
+            @Override
+            protected ArrayList<Book> doInBackground(URL... searchURL) { /* Probably I'm doing something wrong here. The searchURL isn't being used anywhere */
 
-            // Perform HTTP request to the URL and receive a JSON response back
-            String jsonResponse = "";
-            try {
-                jsonResponse = makeHttpRequest(createURL(searchText)); // createURL forms the URL String by formatting the search words, keyword
-            } catch (IOException e) {
-                Log.i("makeHttpRequest()"," Error found while"); //  Handle the IOException
-            }
+                // Perform HTTP request to the URL and receive a JSON response back
+                String jsonResponse = "";
+                try {
+                    jsonResponse = makeHttpRequest(createURL(searchText)); // createURL forms the URL String by formatting the search words, keyword
+                } catch (IOException e) {
+                    Log.i("makeHttpRequest()"," Error found while"); //  Handle the IOException
+                }
 
-            // Return the {@link Event} object as the result fo the {@link TsunamiAsyncTask}
-            return extractDataFromJSON(jsonResponse);
+                // Return the {@link Event} object as the result fo the {@link TsunamiAsyncTask}
+                return extractDataFromJSON(jsonResponse);
         }
 
         @Override
         protected void onPostExecute(ArrayList<Book> books) {
-            findViewById(R.id.ll_pbar).setVisibility(View.GONE);
-            for(int i=0;i<books.size();i++) {
-                Log.i("JSONObj 1", books.get(i).getmTitle() + "");
+            if(books.size()!=0){
+                findViewById(R.id.ll_pbar).setVisibility(View.GONE);
+                for(int i=0;i<books.size();i++) {
+                    Log.i("JSONObj 1", books.get(i).getmTitle() + "");
+                }
+                bk_adapter=new BookAdapter(getApplicationContext(),0,books);
+                ((ListView)findViewById(R.id.lv_bookslist)).setAdapter(bk_adapter);
             }
+            else
+                ((TextView)findViewById(R.id.tv_errormessage)).setText("No book found!");
         }
 
         // Creates URL object from a URL Search string
@@ -229,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
                             mAuthor.replace(0,mAuthor.length(),"");
                             bookAuthors = volumeObject.getJSONArray("authors");
                             for (int j = 0; j < bookAuthors.length(); j++) {
-                                mAuthor.append(bookAuthors.getString(j)).append(" --- ");
+                                mAuthor.append(bookAuthors.getString(j)).append("  ");
                             }
                         }
                         Log.i("VIDIT: book authors",mAuthor.toString()+"");
@@ -256,8 +277,8 @@ public class MainActivity extends AppCompatActivity {
 
                         // logic for 'mDesc'
                         if(volumeObject.has("description"))
-                            if(volumeObject.getString("description").length()>120)
-                                mDesc = volumeObject.getString("description").substring(0,120);
+                            if(volumeObject.getString("description").length()>100)
+                                mDesc = volumeObject.getString("description").substring(0,100);
                         Log.i("VIDIT: book description",mDesc+"");
 
                         // logic for 'mInfoLink'

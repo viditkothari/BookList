@@ -1,9 +1,5 @@
 package in.co.viditkothari.bookswap;
 
-/**
- * Created by viditkothari on 04-Jan-17.
- */
-
 class Book {
 
     private String mImg;

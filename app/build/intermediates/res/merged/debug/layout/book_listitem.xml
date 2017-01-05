@@ -10,13 +10,14 @@
     <ImageView
         android:id="@+id/iv_bookthumbnail"
         android:contentDescription="Book's Thumbnail"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_marginEnd="8dp"/>
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_marginEnd="8dp"
+        android:scaleType="centerCrop" />
 
     <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="72dp"
         android:layout_weight="1"
         android:orientation="vertical">
 
@@ -29,17 +30,17 @@
 
         <TextView
             android:id="@+id/tv_bookauthor_ISBN"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="12sp"
             tools:text="Author: sadasdasdasd | ISBN: 342323532532"/>
 
         <TextView
             android:id="@+id/tv_bookdesc"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="12sp"
-            tools:text="Desc: Hidas dasoiasodiuasidoo oaisdoiuasoiudoiuas udsoai oasiud oiuas oiuasodiu aosiud oaisud oaiuasdouifdifosidfosdfiosdfoosdfo"
+            tools:text="Description: Sample data"
             android:layout_marginEnd="8dp"/>
 
     </LinearLayout>
