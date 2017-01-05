@@ -27,7 +27,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    BookAdapter bk_adapter;
+    BookAdapter bk_adapter; // = new BookAdapter(this,0,new ArrayList<Book>());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,18 +46,24 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     ((TextView) findViewById(R.id.tv_errormessage)).setText(R.string.invalid_searchstring);
                     findViewById(R.id.tv_errormessage).setVisibility(View.VISIBLE);
-                    bk_adapter.clear();
+                    if(((ListView) findViewById(R.id.lv_bookslist)).getCount()>=1 && !bk_adapter.isEmpty()){
+                        Log.i("ListView Count",""+((ListView) findViewById(R.id.lv_bookslist)).getCount());
+                        bk_adapter.clear();
+                        }
+                    }
                 }
-
-            }
         }); // closing parenthesis of "setOnClickListener()" method
 
         findViewById(R.id.llayout_reset).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                bk_adapter.clear();
-                bk_adapter.notifyDataSetChanged();
-
+                if(((ListView) findViewById(R.id.lv_bookslist)).getCount()>=1 && !bk_adapter.isEmpty()){
+                    Log.i("ListView Count",""+((ListView) findViewById(R.id.lv_bookslist)).getCount());
+                    bk_adapter.clear();
+                    bk_adapter.notifyDataSetChanged();
+                    ((EditText)findViewById(R.id.et_searchText)).setText("");
+                    ((EditText)findViewById(R.id.et_searchText)).setHint(R.string.searchHint);
+                }
             }
         });
 
@@ -85,24 +91,34 @@ public class MainActivity extends AppCompatActivity {
 
             // Perform HTTP request to the URL and receive a JSON response back
             String jsonResponse = "";
+            ArrayList<Book> tempB = new ArrayList<>();
             try {
                 jsonResponse = makeHttpRequest(createURL(searchText)); // createURL forms the URL String by formatting the search words, keyword
             } catch (IOException e) {
                 Log.i("makeHttpRequest()", " Error found while"); //  Handle the IOException
             }
-
-            // Return the {@link Event} object as the result fo the {@link TsunamiAsyncTask}
-            return extractDataFromJSON(jsonResponse);
+            if(TextUtils.isEmpty(jsonResponse)){
+                return tempB;
+            }
+            else {
+                return extractDataFromJSON(jsonResponse);
+            }
         }
 
         @Override
         protected void onPostExecute(ArrayList<Book> books) {
+            findViewById(R.id.ll_pbar).setVisibility(View.GONE);
             if (books.size() != 0) {
-                findViewById(R.id.ll_pbar).setVisibility(View.GONE);
                 bk_adapter = new BookAdapter(getApplicationContext(), 0, books);
                 ((ListView) findViewById(R.id.lv_bookslist)).setAdapter(bk_adapter);
-            } else
-                ((TextView) findViewById(R.id.tv_errormessage)).setText(R.string.invalid_searchstring);
+            } else {
+                ((TextView) findViewById(R.id.tv_errormessage)).setText(R.string.nodatafound);
+                ((TextView) findViewById(R.id.tv_errormessage)).setVisibility(View.VISIBLE);
+                if(  ((ListView) findViewById(R.id.lv_bookslist)).getCount()>=1 && !bk_adapter.isEmpty()){
+                    Log.i("ListView Count",""+((ListView) findViewById(R.id.lv_bookslist)).getCount());
+                    bk_adapter.clear();
+                }
+            }
         }
 
         // Creates URL object from a URL Search string
@@ -113,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                 url = url.replaceAll("\\+", "%2B"); // save ('+') sign as a randomString "vv43" so as to conserve it for later
                 url = url.replaceAll("(\\s+)|(,+)|( , +),(, +)", "+"); // replace 1 or more occurrence of blank space (' ') and\or commas (',') with plus sign ('+');
                 url = url.replaceAll("\\++", "+"); // replace 1 or more occurrence of plus sign '+' with just one plus sign ('+');
-                url = "https://www.googleapis.com/books/v1/volumes?q=" + url + "&maxResults=40";
+                url = "https://www.googleapis.com/books/v1/volumes?q=" + url + "&maxResults=40&key=AIzaSyApAhV5l2H68lpWKXM8btgylWmuLUH-QUE";
                 try {
                     completeURL = new URL(url);
                 } catch (MalformedURLException except) {
@@ -170,8 +186,10 @@ public class MainActivity extends AppCompatActivity {
             InputStream iS = null;
 
             // check if the Device is connected to a network
-            if (!isNetworkAvailable())
+            if (!isNetworkAvailable()){
+                Log.e("isNetworkAvailable()","network unavailable!");
                 return null;
+            }
             try {
                 urlconn = (HttpURLConnection) url.openConnection();
                 urlconn.setRequestMethod("GET");
@@ -183,8 +201,11 @@ public class MainActivity extends AppCompatActivity {
                     Log.i("makeHttpRequest()","Response Code 200");
                     Log.i("makeHttpRequest()","InputStream: " + iS.toString());
                     jsonResponse = readFromStream(iS);
-                } else
+                } else{
                     Log.e("Found Error code: ", urlconn.getResponseCode() + " ! ");
+                    return null;
+                }
+
             } catch (IOException e) {
                 Log.e("makeHttpRequest()", " Invalid URL/connection " + url.getPath());
             } finally {

@@ -351,6 +351,7 @@
     <string name="abc_toolbar_collapse_description">Collapse</string>
     <string name="app_name">Book Swap</string>
     <string name="invalid_searchstring">Invalid Search! Re-enter</string>
+    <string name="nodatafound">No relevant data found!</string>
     <string name="resetButtonLabel">Reset Button</string>
     <string name="searchButtonLabel">Search Button</string>
     <string name="searchHint">e.g. Art, Biology, Computer</string>
