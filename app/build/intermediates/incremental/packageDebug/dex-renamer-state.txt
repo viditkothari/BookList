@@ -1,0 +1,7 @@
+#Thu Jan 05 18:26:40 IST 2017
+base.0=E\:\\Development\\AndroidProjects\\BookSwap\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run_ae357a245fc53109fcf74ab653150887e14cc9bd
+renamed.1=classes.dex
+renamed.0=classes2.dex
+file.1=E\:\\Development\\AndroidProjects\\BookSwap\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run-bootstrap_c239a5c7e64f665d130e22d4e1d35f412cfb73b8\\classes.dex
+base.1=E\:\\Development\\AndroidProjects\\BookSwap\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run-bootstrap_c239a5c7e64f665d130e22d4e1d35f412cfb73b8
+file.0=E\:\\Development\\AndroidProjects\\BookSwap\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run_ae357a245fc53109fcf74ab653150887e14cc9bd\\classes.dex
