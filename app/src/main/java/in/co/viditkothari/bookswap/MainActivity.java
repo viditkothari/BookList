@@ -199,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
 
                 String mImg = "Not available";
                 String mTitle = "Not available";
-                StringBuilder mAuthor = new StringBuilder("");
+                StringBuilder mAuthor = new StringBuilder("Not available");
                 String mISBN = "Not available";
                 String mInfoLink = "Not available";
                 String mDesc = "Not available";
@@ -226,17 +226,13 @@ public class MainActivity extends AppCompatActivity {
 
                         // logic for 'mAuthor'
                         if(volumeObject.has("authors")) {
+                            mAuthor.replace(0,mAuthor.length(),"");
                             bookAuthors = volumeObject.getJSONArray("authors");
                             for (int j = 0; j < bookAuthors.length(); j++) {
-                                mAuthor.append(bookAuthors.getString(j)).append(" ");
-                                /*if(bookAuthors.length() == 1 || j <= bookAuthors.length()-1)
-                                    continue;
-                                else {
-                                    mAuthor.append(bookAuthors.getString(j)).append(", ");
-                                }*/
+                                mAuthor.append(bookAuthors.getString(j)).append(" --- ");
                             }
                         }
-                        Log.i("VIDIT: book authors",mAuthor.toString()+" ");
+                        Log.i("VIDIT: book authors",mAuthor.toString()+"");
                        /*
                        if(bookAuthors.length()==1)
                             mAuthor.append(bookAuthors.getString(i));
@@ -251,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
                         if(volumeObject.has("industryIdentifiers")) {
                             bookIDs = volumeObject.getJSONArray("industryIdentifiers");
                             // logic for mISBN
-                            for (int j = 0; j < 2; j++) {
+                            for (int j = 0; j < bookIDs.length(); j++) {
                                 if (bookIDs.getJSONObject(j).getString("type").equalsIgnoreCase("ISBN_13"))
                                     mISBN = bookIDs.getJSONObject(j).getString("identifier");
                             }
@@ -260,7 +256,8 @@ public class MainActivity extends AppCompatActivity {
 
                         // logic for 'mDesc'
                         if(volumeObject.has("description"))
-                            mDesc = volumeObject.getString("description").substring(0,120);
+                            if(volumeObject.getString("description").length()>120)
+                                mDesc = volumeObject.getString("description").substring(0,120);
                         Log.i("VIDIT: book description",mDesc+"");
 
                         // logic for 'mInfoLink'
@@ -270,6 +267,7 @@ public class MainActivity extends AppCompatActivity {
 
                         // Add 'Book' object to 'books' ArrayList
                         books.add(new Book(mImg, mTitle, mAuthor.toString(), mISBN, mDesc, mInfoLink));
+                        mAuthor.replace(0,mAuthor.length(),"");
                     }
                     return books;
                 }

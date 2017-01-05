@@ -5,43 +5,36 @@
     density="420dpi"
     format="8"
     plugin-version="2.2.2"
-    timestamp="1485013637114585"
+    timestamp="1488565189627080"
     token="-3866217292101420659"
     verifier="COLD_SWAP_REQUESTED" >
 
     <task
         name="javac"
-        duration="217" />
+        duration="155" />
     <task
         name="instant-run-dex"
         duration="0" />
     <task
         name="instant-run-transform"
-        duration="9" />
+        duration="15" />
     <task
         name="verifier"
-        duration="2" />
+        duration="1" />
 
     <artifact
         location="E:\Development\AndroidProjects\BookSwap\app\build\intermediates\transforms\dex\debug\folders\1000\5\slice_5\classes.dex"
         type="DEX" />
 
     <build
-        timestamp="1479811251091800"
+        timestamp="1488159561357200"
         verifier="FULL_BUILD_REQUESTED" >
         <artifact
             location="E:\Development\AndroidProjects\BookSwap\app\build\outputs\apk\app-debug.apk"
             type="MAIN" />
     </build>
     <build
-        timestamp="1482986227347638"
-        verifier="COLD_SWAP_REQUESTED" >
-        <artifact
-            location="E:\Development\AndroidProjects\BookSwap\app\build\intermediates\instant-run-resources\resources-debug.ir.ap_"
-            type="RESOURCES" />
-    </build>
-    <build
-        timestamp="1485013637114585"
+        timestamp="1488565189627080"
         verifier="COLD_SWAP_REQUESTED" >
         <artifact
             location="E:\Development\AndroidProjects\BookSwap\app\build\intermediates\transforms\dex\debug\folders\1000\5\slice_5\classes.dex"
