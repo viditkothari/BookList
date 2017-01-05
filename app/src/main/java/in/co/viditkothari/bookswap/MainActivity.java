@@ -9,7 +9,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -29,6 +28,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     BookAdapter bk_adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,19 +37,26 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.iv_search).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String searchTextString = ((EditText)findViewById(R.id.et_searchText)).getText().toString();
-                BookAsyncTask bg_task= new BookAsyncTask(searchTextString);
-                bg_task.execute();
+                String searchTextString = ((EditText) findViewById(R.id.et_searchText)).getText().toString();
+                if (!searchTextString.isEmpty()) {
+                    ((TextView) findViewById(R.id.tv_errormessage)).setText("");
+                    findViewById(R.id.tv_errormessage).setVisibility(View.GONE);
+                    BookAsyncTask bg_task = new BookAsyncTask(searchTextString);
+                    bg_task.execute();
+                } else {
+                    ((TextView) findViewById(R.id.tv_errormessage)).setText(R.string.invalid_searchstring);
+                    findViewById(R.id.tv_errormessage).setVisibility(View.VISIBLE);
+                    bk_adapter.clear();
+                }
+
             }
-        } ); // closing parenthesis of "setOnClickListener()" method
+        }); // closing parenthesis of "setOnClickListener()" method
 
         findViewById(R.id.llayout_reset).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //ListView lv=(ListView)findViewById(R.id.lv_bookslist);
                 bk_adapter.clear();
                 bk_adapter.notifyDataSetChanged();
-                //lv.setAdapter(null);
 
             }
         });
@@ -57,13 +64,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // ************ AsyncTask Class
-    public class BookAsyncTask extends AsyncTask <URL,Void,ArrayList<Book>> {
+    public class BookAsyncTask extends AsyncTask<URL, Void, ArrayList<Book>> {
 
         String searchText;
 
         // private constructor to initialize 'String searchText'
-        private BookAsyncTask(String searchText){
-            this.searchText=searchText;
+        private BookAsyncTask(String searchText) {
+            this.searchText = searchText;
         }
 
         // shows Indeterminate Progress Bar during network access operation
@@ -73,33 +80,29 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // makes Http Request, fetches the JSON file/stream, parses it
-            @Override
-            protected ArrayList<Book> doInBackground(URL... searchURL) { /* Probably I'm doing something wrong here. The searchURL isn't being used anywhere */
+        @Override
+        protected ArrayList<Book> doInBackground(URL... searchURL) { /* Probably I'm doing something wrong here. The searchURL isn't being used anywhere */
 
-                // Perform HTTP request to the URL and receive a JSON response back
-                String jsonResponse = "";
-                try {
-                    jsonResponse = makeHttpRequest(createURL(searchText)); // createURL forms the URL String by formatting the search words, keyword
-                } catch (IOException e) {
-                    Log.i("makeHttpRequest()"," Error found while"); //  Handle the IOException
-                }
+            // Perform HTTP request to the URL and receive a JSON response back
+            String jsonResponse = "";
+            try {
+                jsonResponse = makeHttpRequest(createURL(searchText)); // createURL forms the URL String by formatting the search words, keyword
+            } catch (IOException e) {
+                Log.i("makeHttpRequest()", " Error found while"); //  Handle the IOException
+            }
 
-                // Return the {@link Event} object as the result fo the {@link TsunamiAsyncTask}
-                return extractDataFromJSON(jsonResponse);
+            // Return the {@link Event} object as the result fo the {@link TsunamiAsyncTask}
+            return extractDataFromJSON(jsonResponse);
         }
 
         @Override
         protected void onPostExecute(ArrayList<Book> books) {
-            if(books.size()!=0){
+            if (books.size() != 0) {
                 findViewById(R.id.ll_pbar).setVisibility(View.GONE);
-                for(int i=0;i<books.size();i++) {
-                    Log.i("JSONObj 1", books.get(i).getmTitle() + "");
-                }
-                bk_adapter=new BookAdapter(getApplicationContext(),0,books);
-                ((ListView)findViewById(R.id.lv_bookslist)).setAdapter(bk_adapter);
-            }
-            else
-                ((TextView)findViewById(R.id.tv_errormessage)).setText("No book found!");
+                bk_adapter = new BookAdapter(getApplicationContext(), 0, books);
+                ((ListView) findViewById(R.id.lv_bookslist)).setAdapter(bk_adapter);
+            } else
+                ((TextView) findViewById(R.id.tv_errormessage)).setText(R.string.invalid_searchstring);
         }
 
         // Creates URL object from a URL Search string
@@ -113,8 +116,7 @@ public class MainActivity extends AppCompatActivity {
                 url = "https://www.googleapis.com/books/v1/volumes?q=" + url + "&maxResults=40";
                 try {
                     completeURL = new URL(url);
-                }
-                catch (MalformedURLException except) {
+                } catch (MalformedURLException except) {
                     Log.e(getLocalClassName(), "Error with URL creation", except);
                     return null;
                 }
@@ -125,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Checks for Network availability. Accessed via method call in makeHttpRequest()
         private boolean isNetworkAvailable() {
-            // TODO: Check if accessing getApplicationContext() is causing some leak?
+            // TODO: Please suggest how to check if accessing getApplicationContext() is causing some leak.
             ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(getApplicationContext().CONNECTIVITY_SERVICE);
             NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
             return activeNetworkInfo != null && activeNetworkInfo.isConnected();
@@ -138,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
         private String readFromStream(InputStream iS) throws IOException {
             StringBuilder outSB = new StringBuilder();
             if (iS != null) {
-                InputStreamReader iSReader = new InputStreamReader(iS,"UTF-8");
+                InputStreamReader iSReader = new InputStreamReader(iS, "UTF-8");
                 BufferedReader reader = new BufferedReader(iSReader);
                 String line = reader.readLine();
                 while (line != null) {
@@ -167,8 +169,8 @@ public class MainActivity extends AppCompatActivity {
             // InputStream object declaration to store the InputStream to be received from the HTTP request
             InputStream iS = null;
 
-            if(!isNetworkAvailable())
-                // TODO: check makeHttpRequest for 'null' value where its being called / accessed.
+            // check if the Device is connected to a network
+            if (!isNetworkAvailable())
                 return null;
             try {
                 urlconn = (HttpURLConnection) url.openConnection();
@@ -176,33 +178,24 @@ public class MainActivity extends AppCompatActivity {
                 urlconn.setReadTimeout(9000 /* milliseconds */);
                 urlconn.setConnectTimeout(12000 /* milliseconds */);
                 urlconn.connect();
-                if(urlconn.getResponseCode() == 200){
+                if (urlconn.getResponseCode() == 200) {
                     iS = urlconn.getInputStream();
-                    Log.i("URL Connection Done"," Code 200");
-                    Log.i("URL Connection Done",iS.toString());
+                    Log.i("makeHttpRequest()","Response Code 200");
+                    Log.i("makeHttpRequest()","InputStream: " + iS.toString());
                     jsonResponse = readFromStream(iS);
-                }
-                else
-                    Log.i("Found Error code: ",urlconn.getResponseCode() + " ! ");
-            }
-
-            catch (IOException e) {
-                // TODO: Handle the exception
-                Log.i("Invalid URL! "," Please validity of URL: "+ url.getPath());
-            }
-
-            finally {
+                } else
+                    Log.e("Found Error code: ", urlconn.getResponseCode() + " ! ");
+            } catch (IOException e) {
+                Log.e("makeHttpRequest()", " Invalid URL/connection " + url.getPath());
+            } finally {
                 if (urlconn != null) {
                     urlconn.disconnect();
                 }
                 if (iS != null) {
-                    // function must handle java.io.IOException here
-                    // TODO: why handle IOException here (again)?
                     try {
                         iS.close();
-                    }
-                    catch (IOException ioExcept){
-                        Log.i("Closing InputStream: ","caused " + ioExcept + "to occur!");
+                    } catch (IOException ioExcept) {
+                        Log.e("makeHttpRequest()", "Closing InputStream caused: " + ioExcept);
                     }
 
                 }
@@ -210,20 +203,18 @@ public class MainActivity extends AppCompatActivity {
             return jsonResponse;
         }
 
-
-
         private ArrayList<Book> extractDataFromJSON(String JSON_BooksList) {
             ArrayList<Book> books = new ArrayList<>();
             try {
                 JSONObject rootJSONObject = new JSONObject(JSON_BooksList);
                 JSONArray booksListArray = rootJSONObject.getJSONArray("items");
 
-                String mImg = "Not available";
-                String mTitle = "Not available";
-                StringBuilder mAuthor = new StringBuilder("Not available");
-                String mISBN = "Not available";
-                String mInfoLink = "Not available";
-                String mDesc = "Not available";
+                String mImg = "Unavailable!";
+                String mTitle = "Unavailable!";
+                StringBuilder mAuthor = new StringBuilder("Unavailable!");
+                String mISBN = "Unavailable!";
+                String mInfoLink = "Unavailable!";
+                String mDesc = "Unavailable!";
 
                 // If there are results in the features array
                 if (booksListArray.length() > 0) {
@@ -231,74 +222,65 @@ public class MainActivity extends AppCompatActivity {
                     JSONObject volumeObject;// = bookObject.getJSONObject("volumeInfo");
                     JSONArray bookAuthors;// = volumeObject.getJSONArray("authors");
                     JSONArray bookIDs;// = volumeObject.getJSONArray("industryIdentifiers");
-                    for(int i=0;i<booksListArray.length();i++){
+                    for (int i = 0; i < booksListArray.length(); i++) {
                         bookObject = booksListArray.getJSONObject(i);
                         volumeObject = bookObject.getJSONObject("volumeInfo");
 
                         // logic for 'mImg'
-                        if(volumeObject.getJSONObject("imageLinks").has("thumbnail"))
+                        if (volumeObject.getJSONObject("imageLinks").has("thumbnail"))
                             mImg = volumeObject.getJSONObject("imageLinks").getString("thumbnail");
-                        Log.i("VIDIT: book image",mImg+"");
+                        Log.i("extractData()", "book image" + mImg);
 
                         // logic for 'mTitle'
-                        if(volumeObject.has("title"))
+                        if (volumeObject.has("title"))
                             mTitle = volumeObject.getString("title");
-                        Log.i("VIDIT: book title",mTitle+"");
+                        Log.i("extractData()", "book title" + mTitle);
+
+                        int j;
 
                         // logic for 'mAuthor'
-                        if(volumeObject.has("authors")) {
-                            mAuthor.replace(0,mAuthor.length(),"");
+                        if (volumeObject.has("authors")) {
+                            mAuthor.replace(0, mAuthor.length(), "");
                             bookAuthors = volumeObject.getJSONArray("authors");
-                            for (int j = 0; j < bookAuthors.length(); j++) {
-                                mAuthor.append(bookAuthors.getString(j)).append("  ");
+                            for (j = 0; j < bookAuthors.length(); j++) {
+                                mAuthor.append(bookAuthors.getString(j)).append(" ");
                             }
                         }
-                        Log.i("VIDIT: book authors",mAuthor.toString()+"");
-                       /*
-                       if(bookAuthors.length()==1)
-                            mAuthor.append(bookAuthors.getString(i));
-                        else {
-                            for (j=0; j < bookAuthors.length() - 1; j++) {
-                                mAuthor.append(bookAuthors.getString(j)).append(", ");
-                            }
-                            mAuthor.append(bookAuthors.getString(j+1));
-                        }
-                        */
+                        Log.i("extractData()", "book authors" + mAuthor.toString());
 
-                        if(volumeObject.has("industryIdentifiers")) {
+                        // logic for 'ISBN'
+                        if (volumeObject.has("industryIdentifiers")) {
                             bookIDs = volumeObject.getJSONArray("industryIdentifiers");
                             // logic for mISBN
-                            for (int j = 0; j < bookIDs.length(); j++) {
+                            for (j = 0; j < bookIDs.length(); j++) {
                                 if (bookIDs.getJSONObject(j).getString("type").equalsIgnoreCase("ISBN_13"))
                                     mISBN = bookIDs.getJSONObject(j).getString("identifier");
                             }
                         }
-                            Log.i("VIDIT: book ISBN",mISBN+"");
+                        Log.i("extractData()", "book ISBN" + mISBN);
 
                         // logic for 'mDesc'
-                        if(volumeObject.has("description"))
-                            if(volumeObject.getString("description").length()>100)
-                                mDesc = volumeObject.getString("description").substring(0,100);
-                        Log.i("VIDIT: book description",mDesc+"");
+                        if (volumeObject.has("description"))
+                            if (volumeObject.getString("description").length() > 100)
+                                mDesc = volumeObject.getString("description").substring(0, 100);
+                        Log.i("extractData()", "book description"+ mDesc);
 
                         // logic for 'mInfoLink'
-                        if(volumeObject.has("infoLink"))
+                        if (volumeObject.has("infoLink"))
                             mInfoLink = volumeObject.getString("infoLink");
-                        Log.i("VIDIT: book Info Link",mInfoLink+"");
+                        Log.i("extractData()", "book Info Link" + mInfoLink);
 
                         // Add 'Book' object to 'books' ArrayList
                         books.add(new Book(mImg, mTitle, mAuthor.toString(), mISBN, mDesc, mInfoLink));
-                        mAuthor.replace(0,mAuthor.length(),"");
+                        mAuthor.replace(0, mAuthor.length(), "");
                     }
                     return books;
-                }
-                else
+                } else
                     return null;
+            } catch (JSONException e) {
+                Log.e("extractData()", "JSONException: " + e);
             }
-        catch (JSONException e) {
-                Log.e("JSON Reader Error!", "Problem JSON results:--------"+e);
-            }
-        return null;
+            return null;
         }
     } // End of BookAsyncTask (extends AsyncTask <URL, Void, Book>) class
 } // End of MainActivity class

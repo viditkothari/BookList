@@ -13,27 +13,33 @@
         android:layout_width="72dp"
         android:layout_height="72dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
         android:scaleType="centerCrop" />
 
     <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="72dp"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp">
 
         <TextView
             android:id="@+id/tv_booktitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="16sp"
-            tools:text="Book Title" />
+            tools:text="Book Title"
+            android:textColor="@color/colorAccent"/>
 
         <TextView
             android:id="@+id/tv_bookauthor_ISBN"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="12sp"
-            tools:text="Author: sadasdasdasd | ISBN: 342323532532"/>
+            tools:text="Author | ISBN"
+            android:textColor="@color/colorPrimary"/>
 
         <TextView
             android:id="@+id/tv_bookdesc"
@@ -41,7 +47,8 @@
             android:layout_height="wrap_content"
             android:textSize="12sp"
             tools:text="Description: Sample data"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginEnd="8dp"
+            android:textColor="@color/colorPrimary"/>
 
     </LinearLayout>
 

@@ -350,6 +350,11 @@
     <string name="abc_shareactionprovider_share_with_application">Share with %s</string>
     <string name="abc_toolbar_collapse_description">Collapse</string>
     <string name="app_name">Book Swap</string>
+    <string name="invalid_searchstring">Invalid Search! Re-enter</string>
+    <string name="resetButtonLabel">Reset Button</string>
+    <string name="searchButtonLabel">Search Button</string>
+    <string name="searchHint">e.g. Art, Biology, Computer</string>
+    <string name="searchTextLabel">Enter Search:</string>
     <string name="search_menu_title">Search</string>
     <string name="status_bar_notification_info_overflow">999+</string>
     <style name="AlertDialog.AppCompat" parent="Base.AlertDialog.AppCompat"/>

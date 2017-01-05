@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Book Swap</string>
+    <string name="invalid_searchstring">Invalid Search! Re-enter</string>
+    <string name="searchHint">e.g. Art, Biology, Computer</string>
+    <string name="searchTextLabel">Enter Search:</string>
+    <string name="searchButtonLabel">Search Button</string>
+    <string name="resetButtonLabel">Reset Button</string>
 </resources>

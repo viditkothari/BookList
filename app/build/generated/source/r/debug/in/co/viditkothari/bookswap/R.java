@@ -2056,6 +2056,11 @@ containing a value of this type.
         public static final int abc_shareactionprovider_share_with_application=0x7f060011;
         public static final int abc_toolbar_collapse_description=0x7f060012;
         public static final int app_name=0x7f060021;
+        public static final int invalid_searchstring=0x7f060022;
+        public static final int resetButtonLabel=0x7f060023;
+        public static final int searchButtonLabel=0x7f060024;
+        public static final int searchHint=0x7f060025;
+        public static final int searchTextLabel=0x7f060026;
         public static final int search_menu_title=0x7f060013;
         public static final int status_bar_notification_info_overflow=0x7f060014;
     }

@@ -28,7 +28,7 @@
         android:id="@+id/tv_searchTextLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Enter Search:"
+        android:text="@string/searchTextLabel"
         android:labelFor="@+id/et_searchText" />
 
     <LinearLayout
@@ -42,7 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="9"
             android:inputType="textCapWords"
-            android:hint="e.g. Art, Biology, Computer"/>
+            android:hint="@string/searchHint"/>
 
         <ImageView
             android:id="@+id/iv_search"
@@ -50,7 +50,7 @@
             android:layout_height="56dp"
             android:layout_weight="1"
             android:layout_gravity="bottom"
-            android:contentDescription="Search Button"
+            android:contentDescription="@string/searchButtonLabel"
             android:layout_marginStart="8dp"
             android:src="@drawable/searchicon"/>
 
@@ -59,10 +59,11 @@
     <TextView
         android:id="@+id/tv_errormessage"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="24dp"
         android:layout_weight="0"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"/>
+        android:layout_marginBottom="8dp"
+        android:visibility="gone"/>
 
     <ListView
         android:id="@+id/lv_bookslist"
@@ -83,7 +84,7 @@
             android:layout_width="0dp"
             android:layout_height="24dp"
             android:layout_weight="1"
-            android:contentDescription="Reset value"
+            android:contentDescription="@string/resetButtonLabel"
             android:layout_gravity="center_vertical"
             android:src="@drawable/reseticon"/>
 
