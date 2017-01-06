@@ -34,33 +34,49 @@ class BookAdapter extends ArrayAdapter<Book> {
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null)
             convertView = LayoutInflater.from(this.getContext()).inflate(R.layout.book_listitem, parent, false);
+
         Book bookItem = getItem(position);
 
-        Typeface typeface_b = Typeface.createFromAsset(getContext().getAssets(), "fonts/bn-bi.otf");
-        Typeface typeface_r = Typeface.createFromAsset(getContext().getAssets(), "fonts/bn-r.otf");
-        Typeface typeface_ri = Typeface.createFromAsset(getContext().getAssets(), "fonts/bn-ri.otf");
-
+        // Setting ImageView
         bookImageView = (ImageView) convertView.findViewById(R.id.iv_bookthumbnail);
         if (!bookItem.getmImg().isEmpty())
             new DownloadImageTask().execute(bookItem.getmImg());
-        ((TextView) convertView.findViewById(R.id.tv_booktitle)).setText(bookItem.getmTitle());
-        TextView tv_author_ISBN = (TextView) convertView.findViewById(R.id.tv_bookauthor_ISBN);
 
+        // Setting Book Title
+        TextView tv_bookDesc = (TextView) convertView.findViewById(R.id.tv_bookdesc);
+        if (!bookItem.getmAuthor().isEmpty())
+            tv_bookDesc.setText(bookItem.getmDesc());
+        else
+            tv_bookDesc.setText(R.string.descUnavailable);
+        ((TextView) convertView.findViewById(R.id.tv_booktitle)).setText(bookItem.getmTitle());
+
+        // Setting Book's Author & ISBN Information
+        TextView tv_author_ISBN = (TextView) convertView.findViewById(R.id.tv_bookauthor_ISBN);
         String str_getAuthor_ISBN;
         if (!bookItem.getmAuthor().isEmpty() && !bookItem.getmAuthor().isEmpty())
             str_getAuthor_ISBN = "Author(s): " + bookItem.getmAuthor() + " | ISBN-13: " + bookItem.getmISBN();
         else if (!bookItem.getmAuthor().isEmpty() && bookItem.getmAuthor().isEmpty())
             str_getAuthor_ISBN = "Author(s): " + bookItem.getmAuthor();
-        else if (bookItem.getmAuthor().isEmpty() && bookItem.getmAuthor().isEmpty())
+        else if (bookItem.getmAuthor().isEmpty() && !bookItem.getmAuthor().isEmpty())
             str_getAuthor_ISBN = "ISBN-13: " + bookItem.getmISBN();
         else
-            str_getAuthor_ISBN = bookItem.getmAuthor() + " | " + bookItem.getmISBN();
+            str_getAuthor_ISBN = "Author: Unknown | ISBN: Unavailable";
+        // str_getAuthor_ISBN = bookItem.getmAuthor() + "Author: Unknown | ISBN: Unavailable" + bookItem.getmISBN(); MAY USE THIS while editing this project in future
         tv_author_ISBN.setText(str_getAuthor_ISBN);
 
-        ((TextView) convertView.findViewById(R.id.tv_bookdesc)).setText(bookItem.getmDesc());
+        // Setting Book's Description
+        if (!bookItem.getmDesc().isEmpty())
+            tv_bookDesc.setText(bookItem.getmDesc());
+        else
+            tv_bookDesc.setText(R.string.descUnavailable);
+
+        // Setting Typeface
+        Typeface typeface_b = Typeface.createFromAsset(getContext().getAssets(), "fonts/bn-bi.otf");
+        Typeface typeface_r = Typeface.createFromAsset(getContext().getAssets(), "fonts/bn-r.otf");
+        Typeface typeface_ri = Typeface.createFromAsset(getContext().getAssets(), "fonts/bn-ri.otf");
 
         ((TextView) convertView.findViewById(R.id.tv_booktitle)).setTypeface(typeface_b);
-        ((TextView) convertView.findViewById(R.id.tv_bookdesc)).setTypeface(typeface_r);
+        tv_bookDesc.setTypeface(typeface_r);
         tv_author_ISBN.setTypeface(typeface_ri);
 
         return convertView;

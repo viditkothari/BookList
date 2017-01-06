@@ -20,9 +20,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -37,22 +39,37 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.iv_search).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String searchTextString = ((EditText) findViewById(R.id.et_searchText)).getText().toString();
-                if (!searchTextString.isEmpty()) {
-                    ((TextView) findViewById(R.id.tv_errormessage)).setText("");
-                    findViewById(R.id.tv_errormessage).setVisibility(View.GONE);
-                    BookAsyncTask bg_task = new BookAsyncTask(searchTextString);
-                    bg_task.execute();
-                } else {
-                    ((TextView) findViewById(R.id.tv_errormessage)).setText(R.string.invalid_searchstring);
-                    findViewById(R.id.tv_errormessage).setVisibility(View.VISIBLE);
-                    if(((ListView) findViewById(R.id.lv_bookslist)).getCount()>=1 && !bk_adapter.isEmpty()){
-                        Log.i("ListView Count",""+((ListView) findViewById(R.id.lv_bookslist)).getCount());
+                EditText et_searchText = (EditText) findViewById(R.id.et_searchText);
+                TextView tv_errormessage = (TextView) findViewById(R.id.tv_errormessage);
+                ListView lv_bookslist = (ListView) findViewById(R.id.lv_bookslist);
+                String searchTextString = et_searchText.getText().toString();
+
+                if (!isNetworkAvailable()){
+                    Log.e("isNetworkAvailable()","network unavailable!");
+                    tv_errormessage.setText(R.string.noconnection);
+                    tv_errormessage.setVisibility(View.VISIBLE);
+                    if(lv_bookslist.getCount()>=1 && !bk_adapter.isEmpty()){
+                        Log.i("ListView Count",""+lv_bookslist.getCount());
                         bk_adapter.clear();
+                    }
+                }
+                else{
+                    if (!searchTextString.isEmpty()) {
+                        tv_errormessage.setText("");
+                        tv_errormessage.setVisibility(View.GONE);
+                        BookAsyncTask bg_task = new BookAsyncTask(searchTextString);
+                        bg_task.execute();
+                    } else {
+                        tv_errormessage.setText(R.string.invalid_searchstring);
+                        tv_errormessage.setVisibility(View.VISIBLE);
+                        if(lv_bookslist.getCount()>=1 && !bk_adapter.isEmpty()){
+                            Log.i("ListView Count",""+lv_bookslist.getCount());
+                            bk_adapter.clear();
                         }
                     }
                 }
-        }); // closing parenthesis of "setOnClickListener()" method
+                }
+        });// closing parenthesis of "setOnClickListener()" method
 
         findViewById(R.id.llayout_reset).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,6 +84,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    // Checks for Network availability. Accessed via method call in makeHttpRequest()
+    private boolean isNetworkAvailable() {
+        // TODO: Please suggest how to check if accessing getApplicationContext() is causing some leak.
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(getApplicationContext().CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return (activeNetworkInfo != null) && activeNetworkInfo.isConnected();
     }
 
     // ************ AsyncTask Class
@@ -108,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(ArrayList<Book> books) {
             findViewById(R.id.ll_pbar).setVisibility(View.GONE);
-            if (books.size() != 0) {
+            if (books != null) {
                 bk_adapter = new BookAdapter(getApplicationContext(), 0, books);
                 ((ListView) findViewById(R.id.lv_bookslist)).setAdapter(bk_adapter);
             } else {
@@ -126,10 +151,19 @@ public class MainActivity extends AppCompatActivity {
             URL completeURL;
             if (!TextUtils.isEmpty(url)) {
                 // Used regex to format string for the URL
-                url = url.replaceAll("\\+", "%2B"); // save ('+') sign as a randomString "vv43" so as to conserve it for later
+                /*url = url.replaceAll("\\+", "%2B"); // save ('+') sign as a randomString "vv43" so as to conserve it for later
                 url = url.replaceAll("(\\s+)|(,+)|( , +),(, +)", "+"); // replace 1 or more occurrence of blank space (' ') and\or commas (',') with plus sign ('+');
-                url = url.replaceAll("\\++", "+"); // replace 1 or more occurrence of plus sign '+' with just one plus sign ('+');
+                url = url.replaceAll("\\++", "+"); // replace 1 or more occurrence of plus sign '+' with just one plus sign ('+');*/
+
+                try {
+                    url= URLEncoder.encode((url).toLowerCase(),"UTF-8");
+                    Log.v("URLEncoding", ": " + url);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                    Log.e("URLEncoding error: ",e+"");
+                }
                 url = "https://www.googleapis.com/books/v1/volumes?q=" + url + "&maxResults=40&key=AIzaSyApAhV5l2H68lpWKXM8btgylWmuLUH-QUE";
+                Log.v("URLEncoding 2 ", ": " + url);
                 try {
                     completeURL = new URL(url);
                 } catch (MalformedURLException except) {
@@ -139,14 +173,6 @@ public class MainActivity extends AppCompatActivity {
                 return completeURL;
             } else
                 return null;
-        }
-
-        // Checks for Network availability. Accessed via method call in makeHttpRequest()
-        private boolean isNetworkAvailable() {
-            // TODO: Please suggest how to check if accessing getApplicationContext() is causing some leak.
-            ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(getApplicationContext().CONNECTIVITY_SERVICE);
-            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-            return activeNetworkInfo != null && activeNetworkInfo.isConnected();
         }
 
         /* readFromStream(InputStream) is accessed via makeHttpRequest(URL) method. It does following
@@ -186,10 +212,10 @@ public class MainActivity extends AppCompatActivity {
             InputStream iS = null;
 
             // check if the Device is connected to a network
-            if (!isNetworkAvailable()){
+            /*if (!isNetworkAvailable()){
                 Log.e("isNetworkAvailable()","network unavailable!");
                 return null;
-            }
+            }*/
             try {
                 urlconn = (HttpURLConnection) url.openConnection();
                 urlconn.setRequestMethod("GET");
@@ -230,12 +256,12 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject rootJSONObject = new JSONObject(JSON_BooksList);
                 JSONArray booksListArray = rootJSONObject.getJSONArray("items");
 
-                String mImg = "Unavailable!";
-                String mTitle = "Unavailable!";
-                StringBuilder mAuthor = new StringBuilder("Unavailable!");
-                String mISBN = "Unavailable!";
-                String mInfoLink = "Unavailable!";
-                String mDesc = "Unavailable!";
+                String mImg = "";
+                String mTitle = "";
+                StringBuilder mAuthor = new StringBuilder("");
+                String mISBN = "";
+                String mInfoLink = "";
+                String mDesc = "";
 
                 // If there are results in the features array
                 if (booksListArray.length() > 0) {
@@ -246,11 +272,13 @@ public class MainActivity extends AppCompatActivity {
                     for (int i = 0; i < booksListArray.length(); i++) {
                         bookObject = booksListArray.getJSONObject(i);
                         volumeObject = bookObject.getJSONObject("volumeInfo");
-
+// E:\Development\AndroidProjects\BookSwap\app\src\main\res\drawable
                         // logic for 'mImg'
-                        if (volumeObject.getJSONObject("imageLinks").has("thumbnail"))
+                        if (volumeObject.has("imageLinks") && volumeObject.getJSONObject("imageLinks").has("thumbnail"))
                             mImg = volumeObject.getJSONObject("imageLinks").getString("thumbnail");
-                        Log.i("extractData()", "book image" + mImg);
+                        else
+                            mImg="";
+                        Log.i("extractData()", " book IMAGE : " + mImg);
 
                         // logic for 'mTitle'
                         if (volumeObject.has("title"))
